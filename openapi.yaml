@@ -1,0 +1,340 @@
+openapi: 3.0.3
+info:
+  title: REST API
+  version: 0.0.7
+paths:
+  /:
+    get:
+      tags: ['page']
+      summary: Одностраничное приложение проекта =)
+      operationId: getMainPage
+      responses:
+        200:
+          summary: Сайт проекта
+          content:
+            text/html:
+              schema:
+                $ref: '#components/schemas/BasicHTML'
+  /u/{userId}:
+    get:
+      tags: ['page']
+      summary: Страница-визитка пользователя
+      operationId: getUserPage
+      parameters:
+      - name: userId
+        in: path
+        description: Идентификатор пользователя, чью страницу выводить
+        required: true
+        schema:
+          type: string
+        example: 0
+      responses:
+        200:
+          description: Страница-визитка пользователя
+          content:
+            text/html:
+              schema:
+                $ref: '#components/schemas/BasicHTML'
+  /t/{teamId}:
+    get:
+      deprecated: true
+      tags: ['page']
+      summary: Страница-визитка команды
+      operationId: getTeamPage
+      parameters:
+      - name: teamId
+        in: path
+        description: Идентификатор команды
+        required: true
+        schema:
+          type: string
+        example: 0
+      responses:
+        200:
+          description: Страница-визитка команды
+          content:
+            text/html:
+              schema:
+                $ref: '#components/schemas/BasicHTML'
+  /api/oauth2/authorization/yandex:
+    get:
+      tags: ['page']
+      summary: Перенаправление на страницу авторизации
+      operationId: redirectToAuthPage
+      responses:
+        302:
+          description: Редирект на страницу авторизации
+  /api/me:
+    get:
+      tags: ['user']
+      summary: Получить данные о пользователе
+      operationId: getUser
+      parameters:
+      - $ref: '#/components/parameters/AuthParam'
+      responses:
+        200:
+          description: Данные о пользователе успешно получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: Пользователь не найден
+    put:
+      summary: Изменить данные о пользователе
+      tags: ['user']
+      operationId: putUser
+      parameters:
+      - $ref: '#/components/parameters/AuthParam'
+      requestBody:
+        description: Новые данные
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        200:
+          description: Данные о пользователе успешно изменены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: Пользователь не найден
+        403:
+          description: Нет прав на изменение
+    delete:
+      summary: Удалить данные пользователя
+      tags: ['user']
+      operationId: deleteUser
+      parameters:
+      - $ref: '#/components/parameters/AuthParam'
+      responses:
+        200:
+          description: Данные о пользователе успешно удалены
+        404:
+          description: Пользователь не найден
+        403:
+          description: Нет прав на удаление
+  # Профиль команды
+  /team/{teamId}:
+    get:
+      deprecated: true
+      summary: Получить данные о команде
+      tags: ['team']
+      operationId: getTeam
+      parameters:
+      - $ref: '#/components/parameters/AuthParam'
+      - name: teamId
+        in: path # | cookie | header | query
+        description: Идентификатор команды
+        required: true
+        schema:
+          type: string
+        example: 0
+      responses:
+        200:
+          description: Данные о команде успешно получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        404:
+          description: Команда не найдена
+    put:
+      deprecated: true
+      summary: Изменить данные о команде
+      tags: ['team']
+      operationId: putTeam
+      parameters:
+      - $ref: '#/components/parameters/AuthParam'
+      - $ref: '#/components/parameters/TeamParam'
+      requestBody:
+        description: Новые данные команды
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamIn'
+      responses:
+        200:
+          description: Данные о команде успешно изменены
+        404:
+          description: Команда не найдена
+        403:
+          description: Нет прав на изменение
+    delete:
+      deprecated: true
+      summary: Удалить данные о команде
+      tags: ['team']
+      operationId: deleteTeam
+      parameters:
+      - $ref: '#/components/parameters/AuthParam'
+      - $ref: '#/components/parameters/TeamParam'
+      responses:
+        200:
+          description: Данные о команде успешно удалены
+        404:
+          description: Команда не найдена
+  # Админка
+  #/admin:
+  #  get:
+  #    summary: Страница админки
+  #    operationId: getAdminPage
+  #    responses:
+  #      200:
+  #        description: Страница админки
+  #        content: text/html
+  # /api/admin/auth:
+  # /api/admin/users:
+  # /api/admin/user/{user}:
+  # /api/admin/teams:
+  # /api/admin/team/{team}:
+servers:
+- url: http://localhost
+  description: local testing server
+components:
+  parameters:
+    AuthParam:
+      in: cookie
+      name: JSESSIONID
+      required: true
+      description: Идентификатор сессии
+      schema:
+        type: string
+      example: 5873C894648266626A0766476D4BEE63
+    TeamParam:
+      name: teamId
+      in: path # | cookie | header | query
+      description: Идентификатор команды
+      required: true
+      schema:
+        type: string
+      example: d0adf
+  schemas:
+    User:
+      description: Данные пользователя
+      type: object
+      properties:
+        id:
+          type: string
+        # Moved to contacts
+        # email:
+        #   type: string
+        pfp:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        position: # Должность
+          type: string
+        product:
+          type: string # | array
+        description: # О себе
+          type: string
+        events: # Участвовал
+          type: array
+          items:
+            # Скорее всего, нужно будет сделать объект, а не строку
+            # (указать ссылку, если есть)
+            type: string
+        contacts:
+          type: array
+          items:
+            # И тут тоже =) (нужно указать площадку куда ведёт)
+            type: string
+      example:
+        id: 0
+        name: Иван
+        surname: Иванов
+        position: Программист
+        product: Программа
+        description: |
+          Тонкость не доказывает еще ума. Глупцы и даже сумасшедшие бывают удивительно тонки. Прибавить можно, что тонкость редко соединяется с гением, обыкновенно простодушным, и с великим характером, всегда откровенным.
+        events:
+        - Хакатон
+        - Конференция
+        contacts:
+        - mail@example.com
+        - '@twitter'
+        - я на github
+    Team:
+      description: Данные команды
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        product:
+          type: string # | array
+        description: # | about
+          type: string
+        members:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
+              surname:
+                type: string
+              position:
+                type: string
+      example:
+        id: 0
+        name: Программисты
+        position: Программа
+        description: |
+          Тонкость не доказывает еще ума. Глупцы и даже сумасшедшие бывают удивительно тонки. Прибавить можно, что тонкость редко соединяется с гением, обыкновенно простодушным, и с великим характером, всегда откровенным.
+        members:
+        - id: 0
+          name: Иван
+          surname: Иванов
+          position: Программист
+        - id: 1
+          name: Иван
+          surname: Иванов
+          position: Программист
+        - id: 2
+          name: Иван
+          surname: Иванов
+          position: Программист
+    TeamIn:
+      description: Новые данные команды
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        product:
+          type: string # | array
+        description: # | about
+          type: string
+        members:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+      example:
+        id: 0
+        name: Программисты
+        position: Программа
+        description: |
+          Тонкость не доказывает еще ума. Глупцы и даже сумасшедшие бывают удивительно тонки. Прибавить можно, что тонкость редко соединяется с гением, обыкновенно простодушным, и с великим характером, всегда откровенным.
+        members:
+        - id: 0
+        - id: 2
+    BasicHTML:
+      type: string
+      expmple: |
+                <!DOCTYPE html>
+                <html lang="ru">
+                ...
+
