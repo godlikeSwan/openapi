@@ -511,6 +511,8 @@ components:
         #   type: string
         profilePicture:
           type: string
+        email:
+          type: string
         name:
           type: string
         surname:
@@ -535,6 +537,7 @@ components:
       example:
         id: 0
         profilePicture: 'https://avatarki.ru/dfaff'
+        email: 'email@example.com'
         name: Иван
         surname: Иванов
         position: Программист
