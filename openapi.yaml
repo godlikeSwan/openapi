@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: REST API
-  version: 0.0.9
+  version: 0.0.10
 paths:
   /:
     get:
@@ -506,6 +506,8 @@ components:
       properties:
         id:
           type: string
+        alias:
+          type: string
         # Moved to contacts
         # email:
         #   type: string
@@ -536,6 +538,7 @@ components:
             type: string
       example:
         id: 0
+        alias: helloItsMe
         profilePicture: 'https://avatarki.ru/dfaff'
         email: 'email@example.com'
         name: Иван
@@ -555,6 +558,8 @@ components:
       description: Данные пользователя
       type: object
       properties:
+        alias:
+          type: string
         profilePicture:
           type: string
         name:
@@ -579,6 +584,7 @@ components:
             # И тут тоже =) (нужно указать площадку куда ведёт)
             type: string
       example:
+        alias: helloItsMe
         profilePicture: 'https://avatarki.ru/dfaff'
         name: Иван
         surname: Иванов
