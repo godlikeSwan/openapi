@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: REST API
-  version: 0.0.7
+  version: 0.0.8
 paths:
   /:
     get:
@@ -221,7 +221,7 @@ components:
         # Moved to contacts
         # email:
         #   type: string
-        pfp:
+        profilePicture:
           type: string
         name:
           type: string
@@ -246,12 +246,55 @@ components:
             type: string
       example:
         id: 0
+        profilePicture: 'https://avatarki.ru/dfaff'
         name: Иван
         surname: Иванов
         position: Программист
         product: Программа
         description: |
-          Тонкость не доказывает еще ума. Глупцы и даже сумасшедшие бывают удивительно тонки. Прибавить можно, что тонкость редко соединяется с гением, обыкновенно простодушным, и с великим характером, всегда откровенным.
+          Люблю котиков
+        events:
+        - Хакатон
+        - Конференция
+        contacts:
+        - mail@example.com
+        - '@twitter'
+        - я на github
+    UserIn:
+      description: Данные пользователя
+      type: object
+      properties:
+        profilePicture:
+          type: string
+        name:
+          type: string
+        surname:
+          type: string
+        position: # Должность
+          type: string
+        product:
+          type: string # | array
+        description: # О себе
+          type: string
+        events: # Участвовал
+          type: array
+          items:
+            # Скорее всего, нужно будет сделать объект, а не строку
+            # (указать ссылку, если есть)
+            type: string
+        contacts:
+          type: array
+          items:
+            # И тут тоже =) (нужно указать площадку куда ведёт)
+            type: string
+      example:
+        profilePicture: 'https://avatarki.ru/dfaff'
+        name: Иван
+        surname: Иванов
+        position: Программист
+        product: Программа
+        description: |
+          Люблю котиков
         events:
         - Хакатон
         - Конференция
@@ -264,6 +307,8 @@ components:
       type: object
       properties:
         id:
+          type: string
+        teamPicture:
           type: string
         name:
           type: string
@@ -287,9 +332,10 @@ components:
       example:
         id: 0
         name: Программисты
+        teamPicture: 'https://avatarki.ru/dfafasf'
         position: Программа
         description: |
-          Тонкость не доказывает еще ума. Глупцы и даже сумасшедшие бывают удивительно тонки. Прибавить можно, что тонкость редко соединяется с гением, обыкновенно простодушным, и с великим характером, всегда откровенным.
+          Любим котиков
         members:
         - id: 0
           name: Иван
@@ -309,6 +355,8 @@ components:
       properties:
         id:
           type: string
+        teamPicture:
+          type: string
         name:
           type: string
         product:
@@ -324,10 +372,11 @@ components:
                 type: string
       example:
         id: 0
+        teamPicture: 'https://avatarki.ru/dfafasf'
         name: Программисты
         position: Программа
         description: |
-          Тонкость не доказывает еще ума. Глупцы и даже сумасшедшие бывают удивительно тонки. Прибавить можно, что тонкость редко соединяется с гением, обыкновенно простодушным, и с великим характером, всегда откровенным.
+          Любим котиков
         members:
         - id: 0
         - id: 2
