@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: REST API
-  version: 0.0.11
+  version: 0.0.12
 paths:
   /:
     get:
@@ -529,6 +529,8 @@ components:
       properties:
         id:
           type: string
+        metrikaId:
+          type: string
         alias:
           type: string
         # Moved to contacts
@@ -581,6 +583,8 @@ components:
       description: Данные пользователя
       type: object
       properties:
+        metrikaId:
+          type: string
         alias:
           type: string
         profilePicture:
