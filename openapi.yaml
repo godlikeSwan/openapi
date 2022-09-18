@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: REST API
-  version: 0.0.10
+  version: 0.0.11
 paths:
   /:
     get:
@@ -17,6 +17,7 @@ paths:
                 $ref: '#components/schemas/BasicHTML'
   /u/{userId}:
     get:
+      deprecated: true
       tags: ['page']
       summary: Страница-визитка пользователя
       operationId: getUserPage
@@ -64,6 +65,28 @@ paths:
       responses:
         302:
           description: Редирект на страницу авторизации
+  /api/user/{alias}:
+    get:
+      tags: ['user']
+      summary: Получить данные о пользователе
+      operationId: getUserByAlias
+      parameters:
+      - name: alias
+        in: path
+        description: Альяс пользователя
+        required: true
+        schema:
+          type: string
+        example: helloItsMe
+      responses:
+        200:
+          description: Данные о пользователе успешно получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        404:
+          description: Пользователь не найден
   /api/me:
     get:
       tags: ['user']
