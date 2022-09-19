@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: REST API
-  version: 0.0.13
+  version: 0.0.14
 paths:
   /:
     get:
@@ -65,9 +65,9 @@ paths:
       responses:
         302:
           description: Редирект на страницу авторизации
-  /api/user/{alias}:
+  /api/u/{alias}:
     get:
-      tags: ['user']
+      tags: ['alias']
       summary: Получить данные о пользователе
       operationId: getUserByAlias
       parameters:
@@ -141,12 +141,35 @@ paths:
         403:
           description: Нет прав на удаление
   # Профиль команды
+  /api/t/{alias}:
+    get:
+      tags: ['alias']
+      summary: Получить данные о команде
+      operationId: getTeamByAlias
+      parameters:
+      - name: alias
+        in: path
+        description: Альяс команды
+        required: true
+        schema:
+          type: string
+        example: helloItsWe
+      responses:
+        200:
+          description: Данные о команде успешно получены
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Team'
+        404:
+          description: Пользователь не найден
   /api/team/{teamId}:
     get:
       summary: Получить данные о команде
       tags: ['team']
       operationId: getTeam
       parameters:
+      - $ref: '#/components/parameters/AuthParam'
       - name: teamId
         in: path # | cookie | header | query
         description: Идентификатор команды
@@ -232,7 +255,7 @@ paths:
         200:
           description: Пользователь успешно удален из команды
   /api/team/{teamId}/add:
-    patch:
+    get:
       summary: Добавить текущего авторизированного пользователя к команде teamId
       tags: ['team']
       operationId: addUserToTeam
@@ -253,6 +276,8 @@ paths:
       summary: Отправить приглашение в команду
       tags: ['mail']
       operationId: sendEmail
+      parameters:
+      - $ref: '#/components/parameters/AuthParam'
       requestBody:
         description: Почта, на которую отправить приглашение и teamId команды, в которую хотим пригласить
         content:
