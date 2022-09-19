@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: REST API
-  version: 0.0.12
+  version: 0.0.13
 paths:
   /:
     get:
@@ -141,14 +141,12 @@ paths:
         403:
           description: Нет прав на удаление
   # Профиль команды
-  /team/{teamId}:
+  /api/team/{teamId}:
     get:
-      deprecated: true
       summary: Получить данные о команде
       tags: ['team']
       operationId: getTeam
       parameters:
-      - $ref: '#/components/parameters/AuthParam'
       - name: teamId
         in: path # | cookie | header | query
         description: Идентификатор команды
@@ -165,20 +163,43 @@ paths:
                 $ref: '#/components/schemas/Team'
         404:
           description: Команда не найдена
-    put:
-      deprecated: true
-      summary: Изменить данные о команде
+    patch:
+      summary: Обновить освновную информацию о команде
       tags: ['team']
-      operationId: putTeam
+      operationId: patchTeam
       parameters:
       - $ref: '#/components/parameters/AuthParam'
-      - $ref: '#/components/parameters/TeamParam'
+      - name: teamId
+        in: path # | cookie | header | query
+        description: Идентификатор команды
+        required: true
+        schema:
+          type: string
+        example: 0
       requestBody:
-        description: Новые данные команды
+        description: Новые данные о команде
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TeamIn'
+              $ref: '#/components/schemas/TeamRequestDto'
+      responses:
+        200:
+            description: Данные успешно обновлены
+        404:
+            description: Команда не найдена
+  /api/team:
+    post:
+      summary: Создать новую команду без участников
+      tags: ['team']
+      operationId: postTeam
+      parameters:
+      - $ref: '#/components/parameters/AuthParam'
+      requestBody:
+        description: Основные данные о новой команде
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TeamRequestDto'
       responses:
         200:
           description: Данные о команде успешно изменены
@@ -186,19 +207,63 @@ paths:
           description: Команда не найдена
         403:
           description: Нет прав на изменение
-    delete:
-      deprecated: true
-      summary: Удалить данные о команде
+  /api/team/{teamId}/delete/{userId}:
+    patch:
+      summary: Удалить userId из команды с teamId
       tags: ['team']
-      operationId: deleteTeam
+      operationId: deleteUserFromTeam
       parameters:
       - $ref: '#/components/parameters/AuthParam'
-      - $ref: '#/components/parameters/TeamParam'
+      - name: teamId
+        in: path # | cookie | header | query
+        description: Идентификатор команды
+        required: true
+        schema:
+          type: string
+        example: 3
+      - name: userId
+        in: path # | cookie | header | query
+        description: Идентификатор пользователя
+        required: true
+        schema:
+          type: string
+        example: 8
       responses:
         200:
-          description: Данные о команде успешно удалены
-        404:
-          description: Команда не найдена
+          description: Пользователь успешно удален из команды
+  /api/team/{teamId}/add:
+    patch:
+      summary: Добавить текущего авторизированного пользователя к команде teamId
+      tags: ['team']
+      operationId: addUserToTeam
+      parameters:
+      - $ref: '#/components/parameters/AuthParam'
+      - name: teamId
+        in: path # | cookie | header | query
+        description: Идентификатор команды
+        required: true
+        schema:
+          type: string
+        example: 3
+      responses:
+        200:
+          description: Пользователь успешно добавлен к команде
+  /api/mail/send:
+    patch:
+      summary: Отправить приглашение в команду
+      tags: ['mail']
+      operationId: sendEmail
+      requestBody:
+        description: Почта, на которую отправить приглашение и teamId команды, в которую хотим пригласить
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MailRequestDto'
+      responses:
+        200:
+          description: Приглашение успешно отправлено
+        400:
+          description: Неверные параметры запроса / Ошибка отправления
   /api/v1/files:
     post:
       tags:
@@ -626,6 +691,34 @@ components:
         - mail@example.com
         - '@twitter'
         - я на github
+    TeamRequestDto:
+      description: Данные команды
+      type: object
+      properties:
+        name:
+          type: string
+        product:
+          type: string
+        alias:
+          type: string # | array
+        description: # | about
+          type: string
+      example:
+        name: Never gonna give Ya Up
+        product: 'Яндекс стартаперы'
+        alias: re7De
+        description: Мы делаем дела, когда дела не делаются
+    MailRequestDto:
+      description: Данные
+      type: object
+      properties:
+        teamId:
+          type: integer
+        email:
+          type: string
+      example:
+        teamId: 5
+        email: qwerty@yandex.ru
     Team:
       description: Данные команды
       type: object
@@ -654,25 +747,41 @@ components:
               position:
                 type: string
       example:
-        id: 0
         name: Программисты
-        teamPicture: 'https://avatarki.ru/dfafasf'
-        position: Программа
-        description: |
-          Любим котиков
+        product: 'Яндекс Go'
+        alias: re7De
+        description: Типо описание
         members:
         - id: 0
-          name: Иван
+          profilePicture: url какой-то
+          name: Никита
           surname: Иванов
+          email: qwerty@mail.ru
           position: Программист
+          product: Яндекс Такси
+          description: Люблю котиков
+          alias: eh8Wk
+          events:
+          - свадьба
+          - хакатон
+          contacts:
+          - http://wqerwqr
+          - youtube/rerrrw
         - id: 1
-          name: Иван
-          surname: Иванов
+          profilePicture: http://photolibrary/1.png
+          name: Петя
+          surname: Кердановский
+          email: qwerty124@mail.ru
           position: Программист
-        - id: 2
-          name: Иван
-          surname: Иванов
-          position: Программист
+          product: Яндекс Такси
+          description: Люблю котиков
+          alias: sg4rl
+          events:
+          - свадьба
+          - хакатон
+          contacts:
+          - http://wqerwqr
+          - youtube/rerrrw
     TeamIn:
       description: Новые данные команды
       type: object
